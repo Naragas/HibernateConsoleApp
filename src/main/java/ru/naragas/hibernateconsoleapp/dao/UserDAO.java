@@ -5,6 +5,7 @@ package ru.naragas.hibernateconsoleapp.dao;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.naragas.hibernateconsoleapp.model.User;
@@ -36,11 +37,28 @@ public class UserDAO {
                     logger.error("Rollback impossible: transaction already closed.");
                 }
             }
-            if(e.getCause() instanceof org.postgresql.util.PSQLException){
-                System.out.println("Email is already in the database.");
+
+            Throwable cause = e.getCause();
+            if (cause instanceof PSQLException) {
+                PSQLException pgException = (PSQLException) cause;
+                String sqlState = pgException.getSQLState();
+
+                switch (sqlState) {
+                    case "23505":
+                        System.out.println("Email is already in the database.");
+                        break;
+                    case "23514":
+                        System.out.println("Age must be a positive number.");
+                        break;
+                    default:
+                        System.out.println("Database error: " + pgException.getMessage());
+                }
+
+                logger.warn("PostgreSQL Error [{}]: {}", sqlState, pgException.getMessage());
             } else {
-                logger.warn("Error: {}", e.getCause().getMessage());
+                logger.warn("Unknown DB error: {}", e.getMessage());
             }
+
             return false;
         }
         return true;
