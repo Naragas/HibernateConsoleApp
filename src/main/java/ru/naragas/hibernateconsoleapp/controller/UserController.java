@@ -24,11 +24,11 @@ public class UserController {
     }
 
 
-    public void updateUser(User updatedUser, String name, String email, int age) {
+    public boolean updateUser(User updatedUser, String name, String email, int age) {
         updatedUser.setName(name);
         updatedUser.setEmail(email);
         updatedUser.setAge(age);
-        userDAO.UpdateUser(updatedUser);
+        return userDAO.UpdateUser(updatedUser);
     }
 
     public User getUserById(int id) {

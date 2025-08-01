@@ -72,8 +72,11 @@ public class ConsoleUI {
             String email = readEmail("Enter Email: ");
             int age = readInt("Enter Age: ");
 
-            userController.updateUser(userForUpdate, name, email, age);
-            System.out.println("User edited successfully");
+            if (userController.updateUser(userForUpdate, name, email, age)) {
+                System.out.println("User edited successfully");
+            } else {
+                System.out.println("User not edited");
+            }
         }
     }
 

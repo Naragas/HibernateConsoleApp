@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- Консольный аппендер только для пользовательских сообщений -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%msg%n</pattern> <!-- Только текст без метаинфо -->
+        </encoder>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- Файл логов Hibernate -->
+    <appender name="HIBERNATE_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/hibernate.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Файл логов приложения -->
+    <appender name="APP_FILE" class="ch.qos.logback.core.FileAppender">
+        <file>logs/app.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Корневой логгер: только пользовательские INFO в консоль и в файл -->
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="APP_FILE"/>
+    </root>
+
+    <!-- Hibernate логгер — в файл и не дальше -->
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="HIBERNATE_FILE"/>
+    </logger>
+
+    <logger name="ru.naragas" level="INFO" additivity="false">
+        <appender-ref ref="APP_FILE" />
+    </logger>
+
+</configuration>

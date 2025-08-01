@@ -5,6 +5,8 @@ package ru.naragas.hibernateconsoleapp.dao;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.naragas.hibernateconsoleapp.model.User;
 import ru.naragas.hibernateconsoleapp.util.HibernateUtil;
 
@@ -18,6 +20,7 @@ import java.util.List;
  */
 
 public class UserDAO {
+    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     public boolean addUser(User newUser) {
         Transaction tx = null;
@@ -30,20 +33,20 @@ public class UserDAO {
                 try {
                     tx.rollback();
                 } catch (IllegalStateException ex) {
-                    System.err.println("Rollback impossible: transaction already closed.");
+                    logger.error("Rollback impossible: transaction already closed.");
                 }
             }
             if(e.getCause() instanceof org.postgresql.util.PSQLException){
                 System.out.println("Email is already in the database.");
             } else {
-                System.out.println("Error: " + e.getCause().getMessage());
+                logger.warn("Error: {}", e.getCause().getMessage());
             }
             return false;
         }
         return true;
     }
 
-    public void UpdateUser(User updatedUser) {
+    public boolean UpdateUser(User updatedUser) {
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();
@@ -53,8 +56,10 @@ public class UserDAO {
             if(tx != null){
                 tx.rollback();
             }
-            e.printStackTrace();
+            logger.warn("Error: {}", e.getMessage());
+            return false;
         }
+        return true;
     }
 
     public boolean removeUser(User deletedUser) {
@@ -71,7 +76,7 @@ public class UserDAO {
             if(tx != null){
                 tx.rollback();
             }
-            e.printStackTrace();
+
             return false;
         }
     }
@@ -84,7 +89,7 @@ public class UserDAO {
             tx.commit();
             return allUsers;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            logger.error("Error: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
@@ -93,7 +98,7 @@ public class UserDAO {
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             return session.find(User.class, id);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error: {}", e.getMessage());
             return null;
         }
     }
