@@ -2,12 +2,14 @@ package ru.naragas.hibernateconsoleapp.console;
 
 
 import ru.naragas.hibernateconsoleapp.controller.UserController;
+import ru.naragas.hibernateconsoleapp.model.User;
 
+import java.util.List;
 import java.util.Scanner;
 
 /**
- * @version 1.0
  * @author Naragas
+ * @version 1.0
  * @created 7/31/2025
  */
 
@@ -19,19 +21,21 @@ public class ConsoleUI {
     private final static String SHOW_ONE_USER_MESSAGE = "4. Show User";
     private final static String SHOW_ALL_USERS_MESSAGE = "5. Show list of all Users";
     private final static String EXIT_MESSAGE = "0. Exit";
-    private final static String SELECT_OPTION_MESSAGE = "Select option";
+    private final static String SELECT_OPTION_MESSAGE = "Select option \n";
 
     private final UserController userController = new UserController();
 
 
     public void showMenu() {
         while (true) {
+            System.out.println();
             System.out.println(ADD_USER_MESSAGE);
             System.out.println(EDIT_USER_MESSAGE);
             System.out.println(DELETE_USER_MESSAGE);
             System.out.println(SHOW_ONE_USER_MESSAGE);
             System.out.println(SHOW_ALL_USERS_MESSAGE);
             System.out.println(EXIT_MESSAGE);
+            System.out.println();
             int option = readInt(SELECT_OPTION_MESSAGE);
 
             switch (option) {
@@ -40,7 +44,9 @@ public class ConsoleUI {
                 case 3 -> deleteUser();
                 case 4 -> showUser();
                 case 5 -> showAllUser();
-                case 0 -> { return; }
+                case 0 -> {
+                    return;
+                }
             }
         }
     }
@@ -49,31 +55,61 @@ public class ConsoleUI {
         String name = readNonEmptyString("Enter name: ");
         String email = readEmail("Enter Email: ");
         int age = readInt("Enter Age: ");
-        userController.addUser(name, email,age);
-        System.out.println("User added successfully");
+        if (userController.addUser(name, email, age)) {
+            System.out.println("User added successfully");
+        } else {
+            System.out.println("User not added");
+        }
     }
 
     private void editUser() {
-        int id = readInt("Enter ID: ");
-        String name = readNonEmptyString("Enter name: ");
-        String email = readEmail("Enter Email: ");
-        int age = readInt("Enter Age: ");
-        userController.updateUser(id, name, email, age);
-        System.out.println("User edited successfully");
-    }
-    private void deleteUser() {
-        int id = readInt("Enter ID: ");
-        userController.deleteUser(id);
-        System.out.println("User deleted successfully");
-    }
-    private void showUser() {
-        int id = readInt("Enter ID: ");
-        userController.showUserById(id);
-    }
-    private void showAllUser() {
-        userController.showAllUser();
+        User userForUpdate = checkUserInDbById();
+
+        if (userForUpdate == null) {
+            System.out.println("User not found");
+        } else {
+            String name = readNonEmptyString("Enter name: ");
+            String email = readEmail("Enter Email: ");
+            int age = readInt("Enter Age: ");
+
+            userController.updateUser(userForUpdate, name, email, age);
+            System.out.println("User edited successfully");
+        }
     }
 
+
+    private void deleteUser() {
+        User userForDelete = checkUserInDbById();
+
+        if (userForDelete == null) {
+            System.out.println("User not found");
+        } else {
+            userController.deleteUser(userForDelete);
+            System.out.println("User deleted successfully");
+        }
+    }
+
+    private void showUser() {
+        User userForShow = checkUserInDbById();
+
+        if (userForShow == null) {
+            System.out.println("User not found");
+        } else {
+            System.out.println(userForShow);
+        }
+
+    }
+
+    private void showAllUser() {
+        List<User> allUsers = userController.showAllUser();
+        if (allUsers.isEmpty()) {
+            System.out.println("No users found");
+        } else {
+            for (User user : allUsers) {
+                System.out.println(user);
+            }
+        }
+    }
 
     private int readInt(String message) {
         Scanner scanner = new Scanner(System.in);
@@ -83,7 +119,7 @@ public class ConsoleUI {
             try {
                 return Integer.parseInt(input.trim());
             } catch (NumberFormatException e) {
-                System.out.println("Ошибка: введите целое число.");
+                System.out.println("Error: Please enter an integer.");
             }
         }
     }
@@ -96,7 +132,7 @@ public class ConsoleUI {
             if (!input.isEmpty()) {
                 return input;
             }
-            System.out.println("Ошибка: поле не может быть пустым.");
+            System.out.println("Error: Field cannot be empty.");
         }
     }
 
@@ -108,8 +144,13 @@ public class ConsoleUI {
             if (email.matches("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")) {
                 return email;
             }
-            System.out.println("Ошибка: введите корректный email.");
+            System.out.println("Error: Please enter a valid email.");
         }
+    }
+
+    private User checkUserInDbById() {
+        int id = readInt("Enter ID: ");
+        return userController.getUserById(id);
     }
 
 

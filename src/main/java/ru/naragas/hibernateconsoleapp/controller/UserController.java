@@ -4,6 +4,8 @@ package ru.naragas.hibernateconsoleapp.controller;
 import ru.naragas.hibernateconsoleapp.dao.UserDAO;
 import ru.naragas.hibernateconsoleapp.model.User;
 
+import java.util.List;
+
 /**
  * @author Naragas
  * @version 1.0
@@ -13,31 +15,31 @@ import ru.naragas.hibernateconsoleapp.model.User;
 public class UserController {
     private final UserDAO userDAO = new UserDAO();
 
-    public void addUser(String name, String email, int age) {
+    public boolean addUser(String name, String email, int age) {
         User newUser = new User(name, email, age);
-        userDAO.addUser(newUser);
-    }
-
-
-    public void updateUser(int id, String name, String email, int age) {
-        User user = userDAO.findUserById(id);
-        if (user != null) {
-            user.setName(name);
-            user.setEmail(email);
-            user.setAge(age);
-            userDAO.UpdateUser(user);
-        } else {
-            System.out.println("User not found");
+        if (!userDAO.addUser(newUser)) {
+            return false;
         }
-
+        return true;
     }
 
-    public void deleteUser(int id) {
+
+    public void updateUser(User updatedUser, String name, String email, int age) {
+        updatedUser.setName(name);
+        updatedUser.setEmail(email);
+        updatedUser.setAge(age);
+        userDAO.UpdateUser(updatedUser);
     }
 
-    public void showUserById(int id) {
+    public User getUserById(int id) {
+        return userDAO.findUserById(id);
     }
 
-    public void showAllUser() {
+    public void deleteUser(User deletedUser) {
+        userDAO.removeUser(deletedUser);
+    }
+
+    public List<User> showAllUser() {
+        return userDAO.getAllUsers();
     }
 }

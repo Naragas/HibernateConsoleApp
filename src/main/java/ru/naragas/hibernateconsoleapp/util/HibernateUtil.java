@@ -2,9 +2,7 @@ package ru.naragas.hibernateconsoleapp.util;
 
 
 import org.hibernate.SessionFactory;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 import ru.naragas.hibernateconsoleapp.model.User;
 
 /**
@@ -18,17 +16,10 @@ public class HibernateUtil {
     private static final SessionFactory sessionFactory;
 
     static {
-        StandardServiceRegistry registry = new StandardServiceRegistryBuilder()
-                .configure()
-                .applySettings(new org.hibernate.cfg.Configuration().getProperties())
-                .build();
         try {
-            sessionFactory = new MetadataSources(registry)
-                    .addAnnotatedClass(User.class)
-                    .buildMetadata()
-                    .buildSessionFactory();
+            Configuration configuration = new Configuration().addAnnotatedClass(User.class);
+            sessionFactory = configuration.buildSessionFactory();
         } catch (Exception e) {
-            StandardServiceRegistryBuilder.destroy(registry);
             throw new ExceptionInInitializerError("SessionFactory creation failed: " + e);
         }
     }
