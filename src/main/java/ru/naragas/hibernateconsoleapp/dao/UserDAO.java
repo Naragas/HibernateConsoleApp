@@ -64,7 +64,7 @@ public class UserDAO {
         return true;
     }
 
-    public boolean UpdateUser(User updatedUser) {
+    public boolean updateUser(User updatedUser) {
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();

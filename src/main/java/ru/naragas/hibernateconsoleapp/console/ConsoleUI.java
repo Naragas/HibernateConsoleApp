@@ -2,7 +2,9 @@ package ru.naragas.hibernateconsoleapp.console;
 
 
 import ru.naragas.hibernateconsoleapp.controller.UserController;
+import ru.naragas.hibernateconsoleapp.dao.UserDAO;
 import ru.naragas.hibernateconsoleapp.model.User;
+import ru.naragas.hibernateconsoleapp.service.UserService;
 
 import java.util.List;
 import java.util.Scanner;
@@ -22,8 +24,13 @@ public class ConsoleUI {
     private final static String SHOW_ALL_USERS_MESSAGE = "5. Show list of all Users";
     private final static String EXIT_MESSAGE = "0. Exit";
     private final static String SELECT_OPTION_MESSAGE = "Select option \n";
+    private final static String NAME_REQUEST = "Enter name: ";
+    private final static String EMAIL_REQUEST = "Enter Email: ";
+    private final static String AGE_REQUEST = "Enter age: ";
+    private final static String ID_REQUEST = "Enter ID: ";
+    private final static String USER_NOT_FOUND = "User not found";
 
-    private final UserController userController = new UserController();
+    private final UserController userController = new UserController(new UserService(new UserDAO()));
 
 
     public void showMenu() {
@@ -52,13 +59,13 @@ public class ConsoleUI {
     }
 
     private void addUser() {
-        String name = readNonEmptyString("Enter name: ");
-        String email = readEmail("Enter Email: ");
-        int age = readInt("Enter Age: ");
+        String name = readNonEmptyString(NAME_REQUEST);
+        String email = readEmail(EMAIL_REQUEST);
+        int age = readInt(AGE_REQUEST);
         if (userController.addUser(name, email, age)) {
             System.out.println("User added successfully");
         } else {
-            System.out.println("User not added");
+            System.out.println(USER_NOT_FOUND);
         }
     }
 
@@ -66,16 +73,16 @@ public class ConsoleUI {
         User userForUpdate = checkUserInDbById();
 
         if (userForUpdate == null) {
-            System.out.println("User not found");
+            System.out.println(USER_NOT_FOUND);
         } else {
-            String name = readNonEmptyString("Enter name: ");
-            String email = readEmail("Enter Email: ");
-            int age = readInt("Enter Age: ");
+            String name = readNonEmptyString(NAME_REQUEST);
+            String email = readEmail(EMAIL_REQUEST);
+            int age = readInt(AGE_REQUEST);
 
             if (userController.updateUser(userForUpdate, name, email, age)) {
                 System.out.println("User edited successfully");
             } else {
-                System.out.println("User not edited");
+                System.out.println(USER_NOT_FOUND);
             }
         }
     }
@@ -85,7 +92,7 @@ public class ConsoleUI {
         User userForDelete = checkUserInDbById();
 
         if (userForDelete == null) {
-            System.out.println("User not found");
+            System.out.println(USER_NOT_FOUND);
         } else {
             userController.deleteUser(userForDelete);
             System.out.println("User deleted successfully");
@@ -96,7 +103,7 @@ public class ConsoleUI {
         User userForShow = checkUserInDbById();
 
         if (userForShow == null) {
-            System.out.println("User not found");
+            System.out.println(USER_NOT_FOUND);
         } else {
             System.out.println(userForShow);
         }
@@ -106,7 +113,7 @@ public class ConsoleUI {
     private void showAllUser() {
         List<User> allUsers = userController.showAllUser();
         if (allUsers.isEmpty()) {
-            System.out.println("No users found");
+            System.out.println(USER_NOT_FOUND);
         } else {
             for (User user : allUsers) {
                 System.out.println(user);
@@ -152,7 +159,7 @@ public class ConsoleUI {
     }
 
     private User checkUserInDbById() {
-        int id = readInt("Enter ID: ");
+        int id = readInt(ID_REQUEST);
         return userController.getUserById(id);
     }
 

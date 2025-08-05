@@ -3,6 +3,7 @@ package ru.naragas.hibernateconsoleapp.controller;
 
 import ru.naragas.hibernateconsoleapp.dao.UserDAO;
 import ru.naragas.hibernateconsoleapp.model.User;
+import ru.naragas.hibernateconsoleapp.service.UserService;
 
 import java.util.List;
 
@@ -13,33 +14,30 @@ import java.util.List;
  */
 
 public class UserController {
-    private final UserDAO userDAO = new UserDAO();
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     public boolean addUser(String name, String email, int age) {
-        User newUser = new User(name, email, age);
-        if (!userDAO.addUser(newUser)) {
-            return false;
-        }
-        return true;
+        return userService.addUser(name, email, age);
     }
 
 
     public boolean updateUser(User updatedUser, String name, String email, int age) {
-        updatedUser.setName(name);
-        updatedUser.setEmail(email);
-        updatedUser.setAge(age);
-        return userDAO.UpdateUser(updatedUser);
+        return userService.updateUser(updatedUser, name, email, age);
     }
 
     public User getUserById(int id) {
-        return userDAO.findUserById(id);
+        return userService.findUserById(id);
     }
 
     public void deleteUser(User deletedUser) {
-        userDAO.removeUser(deletedUser);
+        userService.removeUser(deletedUser);
     }
 
     public List<User> showAllUser() {
-        return userDAO.getAllUsers();
+        return userService.getAllUsers();
     }
 }
