@@ -1,6 +1,7 @@
 package ru.naragas.hibernateconsoleapp.service;
 
 
+import lombok.RequiredArgsConstructor;
 import ru.naragas.hibernateconsoleapp.dao.UserDAO;
 import ru.naragas.hibernateconsoleapp.model.User;
 
@@ -12,12 +13,9 @@ import java.util.List;
  * @created 8/5/2025
  */
 
+@RequiredArgsConstructor
 public class UserService {
     private final UserDAO userDAO;
-
-    public UserService(UserDAO userDAO) {
-        this.userDAO = userDAO;
-    }
 
     public boolean addUser(String name, String email, int age) {
         User user = new User(name, email, age);

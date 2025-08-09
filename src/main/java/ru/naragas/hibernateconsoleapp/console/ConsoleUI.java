@@ -94,8 +94,12 @@ public class ConsoleUI {
         if (userForDelete == null) {
             System.out.println(USER_NOT_FOUND);
         } else {
-            userController.deleteUser(userForDelete);
-            System.out.println("User deleted successfully");
+            try {
+                userController.deleteUser(userForDelete);
+                System.out.println("User deleted successfully");
+            } catch (Exception e) {
+                System.out.println("DB error: " + e.getMessage());
+            }
         }
     }
 

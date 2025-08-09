@@ -1,6 +1,9 @@
 package ru.naragas.hibernateconsoleapp.util;
 
 
+
+import lombok.Getter;
+import lombok.experimental.UtilityClass;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import ru.naragas.hibernateconsoleapp.model.User;
@@ -11,8 +14,10 @@ import ru.naragas.hibernateconsoleapp.model.User;
  * @created 7/31/2025
  */
 
+@UtilityClass
 public class HibernateUtil {
 
+    @Getter
     private static final SessionFactory sessionFactory;
 
     static {
@@ -22,9 +27,5 @@ public class HibernateUtil {
         } catch (Exception e) {
             throw new ExceptionInInitializerError("SessionFactory creation failed: " + e);
         }
-    }
-
-    public static SessionFactory getSessionFactory() {
-        return sessionFactory;
     }
 }

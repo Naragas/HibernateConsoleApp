@@ -2,12 +2,14 @@ package ru.naragas.hibernateconsoleapp.dao;
 
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.naragas.hibernateconsoleapp.exception.UserRemoveException;
 import ru.naragas.hibernateconsoleapp.model.User;
 import ru.naragas.hibernateconsoleapp.util.HibernateUtil;
 
@@ -20,10 +22,11 @@ import java.util.List;
  * @created 7/31/2025
  */
 
+@Slf4j
 public class UserDAO {
-    private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
     public boolean addUser(User newUser) {
+        log.info("Adding new user: " + newUser);
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();
@@ -34,7 +37,7 @@ public class UserDAO {
                 try {
                     tx.rollback();
                 } catch (IllegalStateException ex) {
-                    logger.error("Rollback impossible: transaction already closed.");
+                    log.error("Rollback impossible: transaction already closed.");
                 }
             }
 
@@ -54,9 +57,9 @@ public class UserDAO {
                         System.out.println("Database error: " + pgException.getMessage());
                 }
 
-                logger.warn("PostgreSQL Error [{}]: {}", sqlState, pgException.getMessage());
+                log.warn("PostgreSQL Error [{}]: {}", sqlState, pgException.getMessage());
             } else {
-                logger.warn("Unknown DB error: {}", e.getMessage());
+                log.warn("Unknown DB error: {}", e.getMessage());
             }
 
             return false;
@@ -65,6 +68,7 @@ public class UserDAO {
     }
 
     public boolean updateUser(User updatedUser) {
+        log.info("Updating user: " + updatedUser);
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();
@@ -74,13 +78,14 @@ public class UserDAO {
             if(tx != null){
                 tx.rollback();
             }
-            logger.warn("Error: {}", e.getMessage());
+            log.warn("Error: {}", e.getMessage());
             return false;
         }
         return true;
     }
 
-    public boolean removeUser(User deletedUser) {
+    public void removeUser(User deletedUser) {
+        log.info("Removing user: " + deletedUser);
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();
@@ -88,18 +93,17 @@ public class UserDAO {
             session.remove(deletedUser);
 
             tx.commit();
-            return true;
-
         } catch (Exception e) {
             if(tx != null){
                 tx.rollback();
             }
 
-            return false;
+            throw new UserRemoveException("Failed to delete user", e);
         }
     }
 
     public List<User> getAllUsers(){
+        log.info("Getting all users");
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
             tx = session.beginTransaction();
@@ -107,16 +111,19 @@ public class UserDAO {
             tx.commit();
             return allUsers;
         } catch (Exception e) {
-            logger.error("Error: {}", e.getMessage());
+            log.error("Error: {}", e.getMessage());
             return Collections.emptyList();
         }
     }
 
     public User findUserById(int id) {
+        log.info("Finding user by id: " + id);
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
-            return session.find(User.class, id);
+            User findedUser = session.find(User.class, id);
+            log.info("Finding user by id: " + findedUser);
+            return findedUser;
         } catch (Exception e) {
-            logger.error("Error: {}", e.getMessage());
+            log.error("Error: {}", e.getMessage());
             return null;
         }
     }
