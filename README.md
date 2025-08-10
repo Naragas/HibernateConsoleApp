@@ -41,3 +41,29 @@
 ## Исключения
 
 - `UserRemoveException` - кастомное исключение для обработки ошибок удаления пользователя
+
+
+## Пример работы
+
+```console
+1. Add User
+2. Edit User
+3. Delete User
+4. Show User
+5. Show list of all Users
+0. Exit
+
+Select option
+> 1
+Enter name: John Doe
+Enter Email: john.doe@example.com
+Enter age: 30
+User added successfully
+```
+
+
+
+## Контакты
+
+**Автор:** Naragas  
+**GitHub:** [https://github.com/Naragas](https://github.com/Naragas)
