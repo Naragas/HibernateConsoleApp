@@ -128,4 +128,22 @@ public class UserDAO {
             return null;
         }
     }
+
+    //Метод для тестов, очищает базу перед каждым тестом.
+    public void clearUsersTable() {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+
+            session.createNativeQuery("TRUNCATE TABLE users RESTART IDENTITY CASCADE").executeUpdate();
+
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            throw e;
+        }
+    }
+
 }
