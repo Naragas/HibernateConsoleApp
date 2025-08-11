@@ -32,6 +32,7 @@ public class ConsoleUI {
 
     private final UserController userController = new UserController(new UserService(new UserDAO()));
 
+    private final Scanner scanner = new Scanner(System.in);
 
     public void showMenu() {
         while (true) {
@@ -43,7 +44,7 @@ public class ConsoleUI {
             System.out.println(SHOW_ALL_USERS_MESSAGE);
             System.out.println(EXIT_MESSAGE);
             System.out.println();
-            int option = readInt(SELECT_OPTION_MESSAGE);
+            int option = readPositiveInt(SELECT_OPTION_MESSAGE);
 
             switch (option) {
                 case 1 -> addUser();
@@ -61,7 +62,7 @@ public class ConsoleUI {
     private void addUser() {
         String name = readNonEmptyString(NAME_REQUEST);
         String email = readEmail(EMAIL_REQUEST);
-        int age = readInt(AGE_REQUEST);
+        int age = readPositiveInt(AGE_REQUEST);
         if (userController.addUser(name, email, age)) {
             System.out.println("User added successfully");
         } else {
@@ -77,7 +78,7 @@ public class ConsoleUI {
         } else {
             String name = readNonEmptyString(NAME_REQUEST);
             String email = readEmail(EMAIL_REQUEST);
-            int age = readInt(AGE_REQUEST);
+            int age = readPositiveInt(AGE_REQUEST);
 
             if (userController.updateUser(userForUpdate, name, email, age)) {
                 System.out.println("User edited successfully");
@@ -125,13 +126,17 @@ public class ConsoleUI {
         }
     }
 
-    private int readInt(String message) {
-        Scanner scanner = new Scanner(System.in);
+    private int readPositiveInt(String message) {
         while (true) {
             System.out.print(message);
             String input = scanner.nextLine();
             try {
-                return Integer.parseInt(input.trim());
+                int value = Integer.parseInt(input);
+                if (value <= 0) {
+                    System.out.println("Error: Please enter positive number.");
+                } else {
+                    return value;
+                }
             } catch (NumberFormatException e) {
                 System.out.println("Error: Please enter an integer.");
             }
@@ -139,7 +144,6 @@ public class ConsoleUI {
     }
 
     private String readNonEmptyString(String message) {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print(message);
             String input = scanner.nextLine().trim();
@@ -151,7 +155,6 @@ public class ConsoleUI {
     }
 
     private String readEmail(String message) {
-        Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.print(message);
             String email = scanner.nextLine().trim();
@@ -163,7 +166,7 @@ public class ConsoleUI {
     }
 
     private User checkUserInDbById() {
-        int id = readInt(ID_REQUEST);
+        int id = readPositiveInt(ID_REQUEST);
         return userController.getUserById(id);
     }
 

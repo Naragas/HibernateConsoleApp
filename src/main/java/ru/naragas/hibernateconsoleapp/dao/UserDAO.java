@@ -7,8 +7,6 @@ import org.hibernate.Transaction;
 import org.hibernate.Session;
 import org.hibernate.exception.ConstraintViolationException;
 import org.postgresql.util.PSQLException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.naragas.hibernateconsoleapp.exception.UserRemoveException;
 import ru.naragas.hibernateconsoleapp.model.User;
 import ru.naragas.hibernateconsoleapp.util.HibernateUtil;
@@ -84,7 +82,7 @@ public class UserDAO {
         return true;
     }
 
-    public void removeUser(User deletedUser) {
+    public boolean removeUser(User deletedUser) {
         log.info("Removing user: " + deletedUser);
         Transaction tx = null;
         try(Session session = HibernateUtil.getSessionFactory().openSession()){
@@ -93,13 +91,16 @@ public class UserDAO {
             session.remove(deletedUser);
 
             tx.commit();
+
         } catch (Exception e) {
             if(tx != null){
                 tx.rollback();
             }
 
             throw new UserRemoveException("Failed to delete user", e);
+
         }
+        return true;
     }
 
     public List<User> getAllUsers(){

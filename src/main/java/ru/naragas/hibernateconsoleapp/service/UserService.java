@@ -28,8 +28,8 @@ public class UserService {
         return userDAO.updateUser(updatedUser);
     }
 
-    public void removeUser(User deletedUser) {
-        userDAO.removeUser(deletedUser);
+    public boolean removeUser(User deletedUser) {
+        return userDAO.removeUser(deletedUser);
     }
 
     public List<User> getAllUsers() {
